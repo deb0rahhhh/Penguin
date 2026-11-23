@@ -62,20 +62,9 @@ def datetime_info():
 
 # main function that coordinates the script
 def main(): 
-    # CPU
-    cpu_data = cpu_info()
-    print(cpu_data)
-    
-    # RAM
-    ram_data= memory_info()
-    print(ram_data)
-    
-    # Timestamp
-    timestamp_data = datetime_info()
-    print(timestamp_data)
-    
     # System Record
     system_record = {**cpu_info(), **memory_info(), **datetime_info()}
+    print (system_record)
           
 if __name__ == "__main__":
     main()
