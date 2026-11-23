@@ -57,14 +57,18 @@ def datetime_info():
         "date": date,
         "time": time
     }
-    return date_time
-    
+    return date_time    
 
 # main function that coordinates the script
-def main(): 
+def main():
     # System Record
     system_record = {**cpu_info(), **memory_info(), **datetime_info()}
-    print (system_record)
-          
+    print(system_record)
+    
+    with open("system_monitor.csv", 'w', newline="", encoding="utf-8") as file:
+        writer = csv.DictWriter(file, fieldnames=system_record.keys())
+        writer.writeheader()
+        writer.writerow(system_record)
+
 if __name__ == "__main__":
     main()
