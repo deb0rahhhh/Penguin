@@ -1,6 +1,8 @@
 import psutil 
 import urllib.request
 import json
+from datetime import datetime
+import csv
 
 url = "http://localhost:8085/data.json"
 
@@ -16,16 +18,15 @@ def cpu_info():
     
     # CPU Usage
         cpu_usage = psutil.cpu_percent(interval=1)
-        #print (cpu_usage)
     
     # CPU Temperature
-        cpu_temp = data["Children"][0]["Children"][1]
-        
-        for category in cpu_temp["Children"]:
+        cpu_temp = None
+        cpu = data["Children"][0]["Children"][1]
+        for category in cpu["Children"]:
             if category["Text"] == "Temperatures":
                 for sensor in category["Children"]:
                     if sensor ["Text"] == "CPU Package":
-                     print(sensor["Value"])
+                     cpu_temp = (sensor["Value"])
     
     # cpu dict
         cpu_measurements = {
@@ -33,7 +34,6 @@ def cpu_info():
             "cpu_temp": cpu_temp
         }
         return cpu_measurements
-        print(cpu_info())
 
 # function for Memory RAM 
 def memory_info(): 
@@ -46,14 +46,36 @@ def memory_info():
         "available_ram": convert_to_gib((memory.available))
     }
     return ram_measurements
-    print(memory_info())
+
+# function for date-time
+def datetime_info():
+    timestamp = datetime.now()
+    date = timestamp.strftime("%d-%m-%Y") # formats the date (DD/MM/YY)
+    time = timestamp.strftime("%H:%M:%S") # formats the time (hr, min, sec)
+    
+    date_time = {
+        "date": date,
+        "time": time
+    }
+    return date_time
+    
 
 # main function that coordinates the script
 def main(): 
+    # CPU
     cpu_data = cpu_info()
     print(cpu_data)
+    
+    # RAM
     ram_data= memory_info()
     print(ram_data)
-       
+    
+    # Timestamp
+    timestamp_data = datetime_info()
+    print(timestamp_data)
+    
+    # System Record
+    system_record = {**cpu_info(), **memory_info(), **datetime_info()}
+          
 if __name__ == "__main__":
     main()
