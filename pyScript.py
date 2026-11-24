@@ -80,5 +80,9 @@ def main():
         writer.writerow(system_record) 
 
 if __name__ == "__main__":
-    while True:
-        main()
+    try: 
+        while True:
+            main()
+            time.sleep(5)
+    except KeyboardInterrupt:
+        print ("System monitoring stopped")
