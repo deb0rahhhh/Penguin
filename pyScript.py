@@ -4,6 +4,7 @@ import json
 from datetime import datetime
 import csv
 import os
+import urllib.error
 
 url = "http://localhost:8085/data.json"
 
@@ -13,28 +14,27 @@ def convert_to_gib(bytes_value):
 
 # function for CPU
 def cpu_info():
-     # Read the JSON in Python
+ cpu_usage = psutil.cpu_percent(interval=1)
+ cpu_temp = None
+ 
+ try:
         with urllib.request.urlopen(url) as response:
-            data = json.load(response)
-    
-    # CPU Usage
-        cpu_usage = psutil.cpu_percent(interval=1)
-    
-    # CPU Temperature
-        cpu_temp = None
+             data = json.load(response)  
         cpu = data["Children"][0]["Children"][1]
+        
         for category in cpu["Children"]:
             if category["Text"] == "Temperatures":
                 for sensor in category["Children"]:
                     if sensor ["Text"] == "CPU Package":
-                     cpu_temp = (sensor["Value"])
-    
-    # cpu dict
-        cpu_measurements = {
-            "cpu_usage": cpu_usage,
-            "cpu_temp": cpu_temp
-        }
-        return cpu_measurements
+                        cpu_temp = (sensor["Value"])      
+ except (ConnectionResetError, urllib.error.URLError):
+        print("Unable to connect to LibreHardwareMonitor.")
+ 
+ cpu_measurements = {
+     "cpu_usage": cpu_usage,
+     "cpu_temp": cpu_temp
+    }
+ return cpu_measurements
 
 # function for Memory RAM 
 def memory_info(): 
