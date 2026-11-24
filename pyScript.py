@@ -19,7 +19,7 @@ def cpu_info():
  cpu_temp = None
  
  try:
-        with urllib.request.urlopen(url) as response:
+        with urllib.request.urlopen(url, timeout=2) as response:
              data = json.load(response)  
         cpu = data["Children"][0]["Children"][1]
         
@@ -28,7 +28,7 @@ def cpu_info():
                 for sensor in category["Children"]:
                     if sensor ["Text"] == "CPU Package":
                         cpu_temp = (sensor["Value"])      
- except (ConnectionResetError, urllib.error.URLError):
+ except (ConnectionResetError, urllib.error.URLError, TimeoutError):
         print("Unable to connect to LibreHardwareMonitor.")
  
  cpu_measurements = {
@@ -59,7 +59,22 @@ def datetime_info():
         "date": date,
         "time": time
     }
-    return date_time    
+    return date_time 
+
+# function for file handling
+def save_to_csv(system_record):
+    try:
+        file_size = os.path.getsize("system_monitor.csv")
+    except FileNotFoundError:
+        file_size = 0
+        
+    with open("system_monitor.csv", 'a', newline="", encoding="utf-8") as file:
+        writer = csv.DictWriter(file, fieldnames=system_record.keys())
+        
+        if file_size == 0:
+            writer.writeheader()
+        writer.writerow(system_record)
+       
 
 # main function that coordinates the script
 def main():
@@ -67,18 +82,8 @@ def main():
     system_record = {**cpu_info(), **memory_info(), **datetime_info()}
     print(system_record)
     
-    try:
-        file_size = os.path.getsize("system_monitor.csv")
-    except FileNotFoundError:
-        file_size = 0
+    save_to_csv(system_record)
     
-    with open("system_monitor.csv", 'a', newline="", encoding="utf-8") as file:
-        writer = csv.DictWriter(file, fieldnames=system_record.keys())
-        
-        if file_size == 0:
-            writer.writeheader()
-        writer.writerow(system_record) 
-
 if __name__ == "__main__":
     try: 
         while True:
