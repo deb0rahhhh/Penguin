@@ -66,7 +66,10 @@ def main():
     system_record = {**cpu_info(), **memory_info(), **datetime_info()}
     print(system_record)
     
-    file_size = os.path.getsize("system_monitor.csv") 
+    try:
+        file_size = os.path.getsize("system_monitor.csv")
+    except FileNotFoundError:
+        file_size = 0
     
     with open("system_monitor.csv", 'a', newline="", encoding="utf-8") as file:
         writer = csv.DictWriter(file, fieldnames=system_record.keys())
