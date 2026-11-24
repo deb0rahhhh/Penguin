@@ -5,6 +5,7 @@ from datetime import datetime
 import csv
 import os
 import urllib.error
+import time
 
 url = "http://localhost:8085/data.json"
 
@@ -79,4 +80,5 @@ def main():
         writer.writerow(system_record) 
 
 if __name__ == "__main__":
-    main()
+    while True:
+        main()
