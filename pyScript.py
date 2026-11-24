@@ -3,6 +3,7 @@ import urllib.request
 import json
 from datetime import datetime
 import csv
+import os
 
 url = "http://localhost:8085/data.json"
 
@@ -65,10 +66,14 @@ def main():
     system_record = {**cpu_info(), **memory_info(), **datetime_info()}
     print(system_record)
     
-    with open("system_monitor.csv", 'w', newline="", encoding="utf-8") as file:
+    file_size = os.path.getsize("system_monitor.csv") 
+    
+    with open("system_monitor.csv", 'a', newline="", encoding="utf-8") as file:
         writer = csv.DictWriter(file, fieldnames=system_record.keys())
-        writer.writeheader()
-        writer.writerow(system_record)
+        
+        if file_size == 0:
+            writer.writeheader()
+        writer.writerow(system_record) 
 
 if __name__ == "__main__":
     main()
